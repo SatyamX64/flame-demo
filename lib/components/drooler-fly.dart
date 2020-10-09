@@ -5,11 +5,13 @@ import 'package:flame_demo/components/fly.dart';
 import 'package:flame_demo/demo-game.dart';
 
 class DroolerFly extends Fly {
-  DroolerFly(DemoGame game, double x, double y) : super(game) {
+  double get speed => demoGame.tileSize * 1.5;
+  DroolerFly(DemoGame demoGame, double x, double y) : super(demoGame) {
     flyingSprite = List<Sprite>();
     flyingSprite.add(Sprite('flies/drooler-fly-1.png'));
     flyingSprite.add(Sprite('flies/drooler-fly-2.png'));
     deadSprite = Sprite('flies/drooler-fly-dead.png');
-    flyRect = Rect.fromLTWH(x, y, game.tileSize * 1.5, game.tileSize * 1.5);
+    flyRect =
+        Rect.fromLTWH(x, y, demoGame.tileSize * 1.5, demoGame.tileSize * 1.5);
   }
 }
