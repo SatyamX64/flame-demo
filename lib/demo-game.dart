@@ -8,6 +8,10 @@ import 'package:flame_demo/components/drooler-fly.dart';
 import 'package:flame_demo/components/house-fly.dart';
 import 'package:flame_demo/components/hungry-fly.dart';
 import 'package:flame_demo/components/macho-fly.dart';
+import 'package:flame_demo/components/start-button.dart';
+import 'package:flame_demo/view.dart';
+import 'package:flame_demo/views/home-view.dart';
+import 'package:flame_demo/views/lost-view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flame/game/game.dart';
 import 'package:flutter/material.dart';
@@ -21,14 +25,21 @@ class DemoGame extends Game with TapDetector {
   List<Fly> flies = List();
   Backyard background;
   Random random;
+  HomeView homeView;
+  LostView lostView;
+  StartButton startButton;
   DemoGame() {
     initialize();
   }
+  View activeView = View.home;
 
   void initialize() async {
     resize(await Flame.util.initialDimensions());
     random = Random();
     background = Backyard(this);
+    homeView = HomeView(this);
+    lostView = LostView(this);
+    startButton = StartButton(this);
     spawnFly();
   }
 
@@ -36,6 +47,11 @@ class DemoGame extends Game with TapDetector {
   void render(Canvas canvas) {
     background.render(canvas);
     flies.forEach((Fly fly) => fly.render(canvas));
+    if (activeView == View.home) homeView.render(canvas);
+    if (activeView == View.home || activeView == View.lost) {
+      startButton.render(canvas);
+    }
+    if (activeView == View.lost) lostView.render(canvas);
   }
 
   @override
@@ -75,10 +91,25 @@ class DemoGame extends Game with TapDetector {
 
   @override
   void onTapDown(TapDownDetails d) {
-    flies.forEach((Fly fly) {
-      if (fly.flyRect.contains(d.globalPosition)) {
-        fly.onTapDown();
+    bool isHandled = false;
+    if (!isHandled && startButton.rect.contains(d.globalPosition)) {
+      if (activeView == View.home || activeView == View.lost) {
+        startButton.onTapDown();
+        isHandled = true;
       }
-    });
+    }
+    if (!isHandled) {
+      bool didHitAFly = false;
+      flies.forEach((Fly fly) {
+        if (fly.flyRect.contains(d.globalPosition)) {
+          fly.onTapDown();
+          isHandled = true;
+          didHitAFly = true;
+        }
+      });
+      if (activeView == View.playing && !didHitAFly) {
+        activeView = View.lost;
+      }
+    }
   }
 }
