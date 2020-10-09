@@ -5,6 +5,7 @@ import 'package:flame/gestures.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flame/game/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'components/fly.dart';
 
@@ -35,6 +36,7 @@ class DemoGame extends Game with TapDetector {
   @override
   void update(double t) {
     flies.forEach((Fly fly) => fly.update(t));
+    flies.removeWhere((Fly fly) => fly.isOffScreen);
   }
 
   void spawnFly() {
@@ -48,5 +50,14 @@ class DemoGame extends Game with TapDetector {
     screenSize = size;
     tileSize = screenSize.width / 9;
     super.resize(size);
+  }
+
+  @override
+  void onTapDown(TapDownDetails d) {
+    flies.forEach((Fly fly) {
+      if (fly.flyRect.contains(d.globalPosition)) {
+        fly.onTapDown();
+      }
+    });
   }
 }

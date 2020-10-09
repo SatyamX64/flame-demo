@@ -6,6 +6,8 @@ class Fly {
   final DemoGame demoGame;
   Rect flyRect;
   Paint flyPaint;
+  bool isDead = false;
+  bool isOffScreen = false;
 
   Fly(this.demoGame, double x, double y) {
     flyRect = Rect.fromLTWH(x, y, demoGame.tileSize, demoGame.tileSize);
@@ -17,5 +19,18 @@ class Fly {
     c.drawRect(flyRect, flyPaint);
   }
 
-  void update(double t) {}
+  void update(double t) {
+    if (isDead) {
+      flyRect = flyRect.translate(0, demoGame.tileSize * 12 * t);
+    }
+    if (flyRect.top > demoGame.screenSize.height) {
+      isOffScreen = true;
+    }
+  }
+
+  void onTapDown() {
+    isDead = true;
+    flyPaint.color = Color(0xFFFF4757);
+    demoGame.spawnFly();
+  }
 }
