@@ -1,52 +1,52 @@
+import 'dart:math';
 import 'dart:ui';
+import 'package:flame/flame.dart';
 import 'package:flame/gestures.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flame/game/game.dart';
 import 'package:flutter/material.dart';
 
+import 'components/fly.dart';
+
 class DemoGame extends Game with TapDetector {
   Size screenSize;
-  bool hasWon = false;
+  double tileSize;
+  List<Fly> flies = List();
+  Random random;
+  DemoGame() {
+    initialize();
+  }
+
+  void initialize() async {
+    resize(await Flame.util.initialDimensions());
+    random = Random();
+    spawnFly();
+  }
 
   @override
   void render(Canvas canvas) {
     Rect bgRect = Rect.fromLTWH(0, 0, screenSize.width, screenSize.height);
     Paint bgPaint = Paint();
-    bgPaint.color = Colors.blue;
+    bgPaint.color = Color(0xFF576574);
     canvas.drawRect(bgRect, bgPaint);
-    double screenCenterX = screenSize.width / 2;
-    double screenCenterY = screenSize.height / 2;
-    Rect boxRect =
-        Rect.fromLTWH(screenCenterX - 75, screenCenterY - 75, 150, 150);
-    Paint boxPaint = Paint();
-
-    if (hasWon) {
-      boxPaint.color = Color(0xff00ff00);
-    } else {
-      boxPaint.color = Color(0xffffffff);
-    }
-    canvas.drawRect(boxRect, boxPaint);
+    flies.forEach((Fly fly) => fly.render(canvas));
   }
 
   @override
   void update(double t) {
-    // TODO : implement update
+    flies.forEach((Fly fly) => fly.update(t));
   }
-  @override
-  void resize(Size size) {
-    screenSize = size;
-    super.resize(size);
+
+  void spawnFly() {
+    double x = random.nextDouble() * (screenSize.width - tileSize);
+    double y = random.nextDouble() * (screenSize.height - tileSize);
+    flies.add(Fly(this, x, y));
   }
 
   @override
-  void onTapDown(TapDownDetails d) {
-    double screenCenterX = screenSize.width / 2;
-    double screenCenterY = screenSize.height / 2;
-    if (d.globalPosition.dx >= screenCenterX - 75 &&
-        d.globalPosition.dx <= screenCenterX + 75 &&
-        d.globalPosition.dy >= screenCenterY - 75 &&
-        d.globalPosition.dy <= screenCenterY + 75) {
-      hasWon = !hasWon;
-    }
+  void resize(Size size) {
+    screenSize = size;
+    tileSize = screenSize.width / 9;
+    super.resize(size);
   }
 }
