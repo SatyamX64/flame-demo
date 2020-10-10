@@ -4,13 +4,17 @@ import 'package:flame/flame.dart';
 import 'package:flame/gestures.dart';
 import 'package:flame_demo/components/agile-fly.dart';
 import 'package:flame_demo/components/backyard.dart';
+import 'package:flame_demo/components/credits-button.dart';
 import 'package:flame_demo/components/drooler-fly.dart';
+import 'package:flame_demo/components/help-button.dart';
 import 'package:flame_demo/components/house-fly.dart';
 import 'package:flame_demo/components/hungry-fly.dart';
 import 'package:flame_demo/components/macho-fly.dart';
 import 'package:flame_demo/components/start-button.dart';
 import 'package:flame_demo/controllers/spawner.dart';
 import 'package:flame_demo/view.dart';
+import 'package:flame_demo/views/credits-view.dart';
+import 'package:flame_demo/views/help-view.dart';
 import 'package:flame_demo/views/home-view.dart';
 import 'package:flame_demo/views/lost-view.dart';
 import 'package:flutter/gestures.dart';
@@ -30,6 +34,10 @@ class DemoGame extends Game with TapDetector {
   LostView lostView;
   StartButton startButton;
   FlySpawner spawner;
+  HelpButton helpButton;
+  CreditsButton creditsButton;
+  HelpView helpView;
+  CreditsView creditsView;
   DemoGame() {
     initialize();
   }
@@ -43,6 +51,10 @@ class DemoGame extends Game with TapDetector {
     lostView = LostView(this);
     startButton = StartButton(this);
     spawner = FlySpawner(this);
+    helpButton = HelpButton(this);
+    creditsButton = CreditsButton(this);
+    helpView = HelpView(this);
+    creditsView = CreditsView(this);
   }
 
   @override
@@ -52,8 +64,12 @@ class DemoGame extends Game with TapDetector {
     if (activeView == View.home) homeView.render(canvas);
     if (activeView == View.home || activeView == View.lost) {
       startButton.render(canvas);
+      helpButton.render(canvas);
+      creditsButton.render(canvas);
     }
     if (activeView == View.lost) lostView.render(canvas);
+    if (activeView == View.help) helpView.render(canvas);
+    if (activeView == View.credits) creditsView.render(canvas);
   }
 
   @override
@@ -95,12 +111,39 @@ class DemoGame extends Game with TapDetector {
   @override
   void onTapDown(TapDownDetails d) {
     bool isHandled = false;
+
+    // dialog boxes
+    if (!isHandled) {
+      if (activeView == View.help || activeView == View.credits) {
+        activeView = View.home;
+        isHandled = true;
+      }
+    }
+
+    // start button
     if (!isHandled && startButton.rect.contains(d.globalPosition)) {
       if (activeView == View.home || activeView == View.lost) {
         startButton.onTapDown();
         isHandled = true;
       }
     }
+    // help button
+    if (!isHandled && helpButton.rect.contains(d.globalPosition)) {
+      if (activeView == View.home || activeView == View.lost) {
+        helpButton.onTapDown();
+        isHandled = true;
+      }
+    }
+
+    // credits button
+    if (!isHandled && creditsButton.rect.contains(d.globalPosition)) {
+      if (activeView == View.home || activeView == View.lost) {
+        creditsButton.onTapDown();
+        isHandled = true;
+      }
+    }
+
+    //flies
     if (!isHandled) {
       bool didHitAFly = false;
       flies.forEach((Fly fly) {
