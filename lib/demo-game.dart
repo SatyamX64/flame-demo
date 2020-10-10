@@ -9,6 +9,7 @@ import 'package:flame_demo/components/house-fly.dart';
 import 'package:flame_demo/components/hungry-fly.dart';
 import 'package:flame_demo/components/macho-fly.dart';
 import 'package:flame_demo/components/start-button.dart';
+import 'package:flame_demo/controllers/spawner.dart';
 import 'package:flame_demo/view.dart';
 import 'package:flame_demo/views/home-view.dart';
 import 'package:flame_demo/views/lost-view.dart';
@@ -28,6 +29,7 @@ class DemoGame extends Game with TapDetector {
   HomeView homeView;
   LostView lostView;
   StartButton startButton;
+  FlySpawner spawner;
   DemoGame() {
     initialize();
   }
@@ -40,7 +42,7 @@ class DemoGame extends Game with TapDetector {
     homeView = HomeView(this);
     lostView = LostView(this);
     startButton = StartButton(this);
-    spawnFly();
+    spawner = FlySpawner(this);
   }
 
   @override
@@ -58,6 +60,7 @@ class DemoGame extends Game with TapDetector {
   void update(double t) {
     flies.forEach((Fly fly) => fly.update(t));
     flies.removeWhere((Fly fly) => fly.isOffScreen);
+    spawner.update(t);
   }
 
   void spawnFly() {

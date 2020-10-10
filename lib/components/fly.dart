@@ -60,6 +60,6 @@ class Fly {
 
   void onTapDown() {
     isDead = true;
-    demoGame.spawnFly();
+  
   }
 }
